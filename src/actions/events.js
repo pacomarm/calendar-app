@@ -1,4 +1,5 @@
 import { fetchConToken } from "../helpers/fetch"
+import { prepareEvents } from "../helpers/prepareEvents";
 import { types } from "../types/types"
 
 export const eventStartAddNew = (event) => {
@@ -38,3 +39,24 @@ export const eventUpdated = (event) => ({
 })
 
 export const eventDeleted = () => ({ type: types.eventDeleted })
+
+export const eventStartLoading = () => {
+    return async(dispatch) => {
+        try{
+            const res = await fetchConToken( 'events', 'GET' );
+            const body = await res.json();
+            console.log(prepareEvents(body.events));
+            const events = prepareEvents(body.events);
+
+            dispatch( eventLoaded(events) )
+
+        } catch (e){
+            console.log(e);
+        }
+    }
+}
+
+const eventLoaded = (events) => ({
+    type: types.eventLoaded,
+    payload: events
+})
