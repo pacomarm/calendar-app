@@ -41,20 +41,27 @@ export const startRegister = (name, email, password) => {
 
 export const startChecking = () => {
     return async(dispatch) => {
-        const res = await fetchConToken('auth/renew');
-        const body = await res.json();
 
-        if (body.ok){
-            localStorage.setItem( 'token', body.token );
-            localStorage.setItem( 'token-init-date', new Date().getTime() );
-            dispatch( login({
-                uid: body.uid,
-                name: body.name
-            }));
-
-        } else {
-            dispatch( checkingFinish() )
+        try{
+            const res = await fetchConToken('auth/renew');
+            const body = await res.json();
+    
+            if (body.ok){
+                localStorage.setItem( 'token', body.token );
+                localStorage.setItem( 'token-init-date', new Date().getTime() );
+                dispatch( login({
+                    uid: body.uid,
+                    name: body.name
+                }));
+    
+            } else {
+                dispatch( checkingFinish() )
+                throw new Error(body.msg || 'Error!');
+            }
+        } catch(e){
+            console.log(e.msg || 'Error al validar token');
         }
+
     }
 }
 
