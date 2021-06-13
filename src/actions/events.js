@@ -46,8 +46,8 @@ export const eventStartUpdate = (event) => {
                 Swal.fire('Error!', body.msg || 'Could not update event :(', 'error')
             }
 
-        } catch (e){
-            console.log(e);
+        } catch (error){
+            console.log(error);
         }
     }
 }
@@ -57,7 +57,28 @@ const eventUpdated = (event) => ({
     payload: event
 })
 
-export const eventDeleted = () => ({ type: types.eventDeleted })
+export const eventStartDelete = () => {
+    
+    return async(dispatch, getState) => {
+
+        const {id} = getState().calendar.activeEvent;
+        try{
+            const res = await fetchConToken( `events/${id}`, {}, 'DELETE' );
+            const body = await res.json();
+
+            if(body.ok){
+                dispatch( eventDeleted() )
+            } else {
+                Swal.fire('Error!', body.msg || 'Could not delete the event :(', 'error')
+            }
+
+        } catch (e){
+            console.log(e);
+        }
+    }
+}
+
+const eventDeleted = () => ({ type: types.eventDeleted })
 
 export const eventStartLoading = () => {
     return async(dispatch) => {
